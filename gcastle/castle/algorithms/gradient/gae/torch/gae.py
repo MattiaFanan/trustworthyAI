@@ -157,9 +157,7 @@ class GAE(BaseLearner):
 
     def learn(self, data, columns=None, **kwargs):
 
-        x = torch.from_numpy(data)
-        if hasattr(self, 'device'):
-            x = x.to(self.device)
+        x = torch.from_numpy(data).to(self.device)
 
         self.n, self.d = x.shape[:2]
         if x.ndim == 2:
@@ -170,10 +168,7 @@ class GAE(BaseLearner):
 
         w_est = self._gae(x).detach().cpu().numpy()
 
-        self.weight_causal_matrix = Tensor(w_est, index=columns, columns=columns)
-
-        if hasattr(self, 'device'):
-            self.weight_causal_matrix = self.weight_causal_matrix.to(self.device)
+        self.weight_causal_matrix = Tensor(w_est, index=columns, columns=columns).to(self.device)
 
         causal_matrix = (abs(w_est) > self.graph_thresh).astype(int)
         self.causal_matrix = Tensor(causal_matrix,
